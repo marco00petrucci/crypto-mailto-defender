@@ -1,0 +1,383 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <foreignObject width="256" height="256">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="margin: 0; padding: 0; width: 100%; height: 100%;">
+
+      <div class="sfeb-modern-icon">
+
+        <!-- Cuore visivo -->
+        <div class="sfeb-center-visual">
+
+          <!-- Wrapper di Scala: Allinea busta, lucchetto e chiave -->
+          <div class="sfeb-padlock-wrapper">
+
+            <!-- Busta da lettere -->
+            <div class="sfeb-envelope">
+              <div class="sfeb-env-left"></div>
+              <div class="sfeb-env-right"></div>
+              <div class="sfeb-env-bottom"></div>
+              <div class="sfeb-env-top"></div>
+            </div>
+
+            <!-- Gruppo Lucchetto e Chiave -->
+            <div class="sfeb-padlock-container">
+              <!-- Manico del lucchetto -->
+              <div class="sfeb-shackle"></div>
+
+              <!-- Corpo del lucchetto -->
+              <div class="sfeb-lock-body">
+                <div class="sfeb-keyhole"></div>
+              </div>
+
+              <!-- Chiave -->
+              <div class="sfeb-key-container">
+                <div class="sfeb-key-bow"></div>
+                <div class="sfeb-key-shaft">
+                  <div class="sfeb-key-teeth">
+                    <div class="sfeb-key-tooth-1"></div>
+                    <div class="sfeb-key-tooth-2"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Banner Galleggiante con Pulsazione -->
+          <div class="sfeb-floating-pill">
+            <div class="sfeb-pulse-ring"></div>CRYPTO MAILTO DEFENDER </div>
+
+        </div>
+
+        <!-- Testo in basso -->
+        <div class="sfeb-text-bottom">PROTECT YOUR E-MAILS</div>
+      </div>
+
+      <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900');
+
+        /* Contenitore Principale 256x256 */
+        .sfeb-modern-icon {
+          width: 256px;
+          height: 256px;
+          background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+          border-radius: 56px;
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: space-between;
+          padding: 26px 0 36px 0;
+          box-sizing: border-box;
+          font-family: 'Montserrat', system-ui, sans-serif;
+          overflow: hidden;
+        }
+
+        /* Luce ambientale delicata sullo sfondo */
+        .sfeb-modern-icon::before {
+          content: '';
+          position: absolute;
+          top: -50%;
+          left: -50%;
+          width: 200%;
+          height: 200%;
+          background: radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
+          pointer-events: none;
+        }
+
+        /* Tipografia cornice */
+        .sfeb-text-bottom {
+          color: #ffffff;
+          font-size: 12px;
+          font-weight: 900;
+          letter-spacing: 1.5px;
+          text-transform: uppercase;
+          z-index: 2;
+          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Sezione centrale */
+        .sfeb-center-visual {
+          position: relative;
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-grow: 1;
+        }
+
+        /* Scaler centrato geometricamente */
+        .sfeb-padlock-wrapper {
+          position: absolute;
+          width: 360px;
+          height: 300px;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -60%) scale(0.40);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+
+        /* --- BUSTA DA LETTERE --- */
+        .sfeb-envelope {
+          position: absolute;
+          width: 360px;
+          height: 240px;
+          background: #94a3b8;
+          border-radius: 12px;
+          box-shadow: 0 35px 50px rgba(76, 29, 149, 0.5);
+          overflow: hidden;
+          top: 30px;
+          z-index: 1;
+        }
+
+        .sfeb-env-left, .sfeb-env-right, .sfeb-env-bottom, .sfeb-env-top {
+          position: absolute;
+          border-radius: 8px;
+        }
+
+        /* Alette laterali */
+        .sfeb-env-left {
+          top: 30px; left: -160px;
+          width: 260px; height: 260px;
+          background: #e2e8f0;
+          transform: rotate(45deg);
+          box-shadow: 5px -5px 15px rgba(0,0,0,0.05);
+          z-index: 1;
+        }
+
+        .sfeb-env-right {
+          top: 30px; right: -160px;
+          width: 260px; height: 260px;
+          background: #e2e8f0;
+          transform: rotate(45deg);
+          box-shadow: -5px 5px 15px rgba(0,0,0,0.05);
+          z-index: 1;
+        }
+
+        /* Aletta inferiore */
+        .sfeb-env-bottom {
+          bottom: -150px; left: 50px;
+          width: 260px; height: 260px;
+          background: #f8fafc;
+          transform: rotate(45deg);
+          filter: drop-shadow(0 -5px 10px rgba(0,0,0,0.05));
+          z-index: 2;
+        }
+
+        /* Aletta superiore (Lembo che chiude) */
+        .sfeb-env-top {
+          top: -140px; left: 50px;
+          width: 260px; height: 260px;
+          background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+          transform: rotate(45deg);
+          filter: drop-shadow(0 10px 15px rgba(0,0,0,0.15));
+          z-index: 3;
+        }
+
+
+        /* --- LUCCHETTO STRUTTURATO (sovrapposto) --- */
+        .sfeb-padlock-container {
+          position: relative;
+          width: 220px;
+          height: 260px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          z-index: 2;
+          margin-top: 25px;
+          animation: sfeb-drift 6s ease-in-out infinite;
+        }
+
+        .sfeb-shackle {
+          width: 100px;
+          height: 80px;
+          border: 22px solid #e2e8f0;
+          border-bottom: 0;
+          border-radius: 80px 80px 0 0;
+          box-shadow: inset 0 8px 15px rgba(0, 0, 0, 0.15);
+          position: relative;
+          z-index: 1;
+        }
+
+        .sfeb-lock-body {
+          width: 180px;
+          height: 140px;
+          background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+          border-radius: 24px;
+          box-shadow: 0 25px 40px rgba(0, 0, 0, 0.4), inset 0 6px 15px rgba(255, 255, 255, 0.3);
+          position: relative;
+          z-index: 2;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-top: -10px;
+        }
+
+        .sfeb-keyhole {
+          width: 28px;
+          height: 28px;
+          background: #022c22;
+          border-radius: 50%;
+          position: relative;
+          box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.6);
+        }
+
+        .sfeb-keyhole::after {
+          content: '';
+          position: absolute;
+          top: 16px;
+          left: 4px;
+          width: 20px;
+          height: 30px;
+          background: #022c22;
+          clip-path: polygon(20% 0, 80% 0, 100% 100%, 0 100%);
+          border-radius: 0 0 6px 6px;
+        }
+
+        /* --- CHIAVE --- */
+        .sfeb-key-container {
+          position: absolute;
+          top: 55%;
+          left: -70px;
+          transform: translateY(-50%) rotate(-10deg);
+          display: flex;
+          align-items: center;
+          z-index: 3;
+          filter: drop-shadow(0 15px 20px rgba(0, 0, 0, 0.4));
+          animation: sfeb-key-hover 2s ease-in-out infinite alternate;
+        }
+
+        .sfeb-key-bow {
+          width: 55px;
+          height: 55px;
+          border: 14px solid #fbbf24;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.1);
+          position: relative;
+          box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .sfeb-key-bow::after {
+          content: '';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 12px;
+          height: 12px;
+          background: #fbbf24;
+          border-radius: 50%;
+        }
+
+        .sfeb-key-shaft {
+          width: 80px;
+          height: 16px;
+          background: linear-gradient(to bottom, #fcd34d 0%, #fbbf24 100%);
+          margin-left: -5px;
+          border-radius: 0 8px 8px 0;
+          position: relative;
+        }
+
+        .sfeb-key-teeth {
+          position: absolute;
+          bottom: -18px;
+          right: 12px;
+          display: flex;
+          gap: 6px;
+        }
+
+        .sfeb-key-tooth-1 {
+          width: 14px;
+          height: 20px;
+          background: #fbbf24;
+          border-radius: 0 0 4px 4px;
+        }
+
+        .sfeb-key-tooth-2 {
+          width: 14px;
+          height: 12px;
+          background: #fbbf24;
+          border-radius: 0 0 4px 4px;
+        }
+
+        /* BANNER GALLEGGIANTE */
+        .sfeb-floating-pill {
+          position: absolute;
+          bottom: 32px;
+          background: #ffffff;
+          padding: 0 20px;
+          height: 38px;
+          border-radius: 19px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          box-shadow: 0 12px 24px rgba(109, 40, 217, 0.5), 0 4px 8px rgba(0, 0, 0, 0.15);
+          color: #6d28d9;
+          font-size: 12.5px;
+          font-weight: 900;
+          z-index: 4;
+          animation: sleek-float 4s ease-in-out infinite;
+        }
+
+        /* Il led di notifica animato nel banner */
+        .sfeb-pulse-ring {
+          width: 8px;
+          height: 8px;
+          background: #6366f1;
+          border-radius: 50%;
+          position: relative;
+          flex-shrink: 0;
+        }
+
+        .sfeb-pulse-ring::after {
+          content: '';
+          position: absolute;
+          inset: -4px;
+          border-radius: 50%;
+          border: 2px solid #6366f1;
+          animation: pulse-ring 2s cubic-bezier(0.2, 0, 0.2, 1) infinite;
+        }
+
+        /* --- ANIMAZIONI --- */
+        @keyframes sleek-float {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-6px);
+          }
+        }
+
+        @keyframes sfeb-drift {
+          0%, 100% {
+            transform: translateY(-20px);
+          }
+          50% {
+            transform: translateY(-10px);
+          }
+        }
+
+        @keyframes sfeb-key-hover {
+          0% {
+            transform: translateX(-10%) translateY(-50%) rotate(-10deg) translateX(0);
+          }
+          100% {
+            transform: translateX(10%) translateY(-48%) rotate(5deg) translateX(5px);
+          }
+        }
+
+        @keyframes pulse-ring {
+          0% {
+            transform: scale(0.6);
+            opacity: 1;
+          }
+          100% {
+            transform: scale(2.5);
+            opacity: 0;
+          }
+        }
+      </style>
+    </div>
+  </foreignObject>
+</svg>
