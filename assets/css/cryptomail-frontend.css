@@ -1,3 +1,50 @@
 .cryptomail-text-link {
   cursor: pointer;
 }
+
+.cryptomail-loading {
+  cursor: progress !important;
+  pointer-events: none;
+  user-select: none;
+}
+
+.cryptomail-loading .cryptomail-mask {
+  position: relative !important;
+  display: inline-block;
+  width: 0.9em;
+  height: 0.9em;
+  overflow: hidden;
+  text-indent: -9999px;
+  vertical-align: -0.12em;
+}
+
+.cryptomail-loading:not(.cryptomail-text-link) {
+  position: relative !important;
+  -webkit-text-fill-color: transparent !important;
+  text-shadow: none !important;
+}
+
+.cryptomail-loading:not(.cryptomail-text-link)>* {
+  opacity: 0 !important;
+}
+
+.cryptomail-loading .cryptomail-mask::after,
+.cryptomail-loading:not(.cryptomail-text-link)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 0.9em;
+  height: 0.9em;
+  box-sizing: border-box;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: cryptomail-spin 0.6s linear infinite;
+}
+
+@keyframes cryptomail-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
