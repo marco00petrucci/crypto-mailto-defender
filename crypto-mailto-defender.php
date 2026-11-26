@@ -3,13 +3,12 @@
 /**
  * Plugin Name: Crypto Mailto Defender
  * Description: Enterprise spam protection. Encrypts mailto: links server-side with AES-256 and securely decrypts them via AJAX upon human interaction.
- * Version: 1.0.1
+ * Version: 1.1.0
  * Author: Marco Petrucci
  * Author URI: https://linktr.ee/marco00petrucci
  * Text Domain: crypto-mailto-defender
- * Domain Path: /languages
  * Requires at least: 5.6
- * Tested up to: 7.0
+ * Tested up to: 7.1
  * Requires PHP: 7.4
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -23,8 +22,11 @@ if (!defined('ABSPATH')) {
 
 class Plugin
 {
+  private const VERSION = '1.1.0';
+
   private string $option_key = 'cryptomail_aes_secret';
   private string $secret;
+  private string $raw_key;
   private bool $has_processed_links = false;
 
   // Default settings properties
@@ -36,7 +38,8 @@ class Plugin
 
   public function __construct()
   {
-    $this->secret = $this->get_secret();
+    $this->secret  = $this->get_secret();
+    $this->raw_key = base64_decode($this->secret);
     $this->load_settings();
 
     // Register assets
@@ -84,13 +87,12 @@ class Plugin
   public function enqueue_admin_assets(string $hook): void
   {
     if ($hook !== 'settings_page_crypto-mailto-defender') return;
-    wp_enqueue_style('cryptomail-admin-style', plugin_dir_url(__FILE__) . 'assets/css/cryptomail-admin.css', [], '1.0.0');
+    wp_enqueue_style('cryptomail-admin-style', plugin_dir_url(__FILE__) . 'assets/css/cryptomail-admin.css', [], self::VERSION);
   }
 
   /** Starts catching the whole HTML output before sending it to the browser */
   public function start_output_buffer(): void
   {
-    // Do not intercept admin dashboard, REST API, AJAX or RSS feeds
     if (is_admin() || wp_doing_ajax() || wp_is_json_request() || is_feed() || (defined('REST_REQUEST') && REST_REQUEST)) {
       return;
     }
@@ -99,7 +101,8 @@ class Plugin
 
   public function process_html(string $html): string
   {
-    if (empty($html)) {
+    // Ultra-fast early exit: if no '@' exists in the page, skip all regex execution
+    if (empty($html) || strpos($html, '@') === false) {
       return $html;
     }
 
@@ -108,14 +111,14 @@ class Plugin
     // 1. Process all standard mailto: links globally
     if (stripos($html, 'mailto:') !== false) {
       $html = preg_replace_callback(
-        '/<a\b([^>]*?)\shref=(["\'])mailto:(.*?)\2([^>]*)>(.*?)<\/a>/is',
+        '/<a\b([^>]*?)\shref\s*=\s*(["\'])\s*(?:mailto:\s*)+(.*?)\2([^>]*)>(.*?)<\/a>/is',
         [$this, 'replace_link'],
         $html
       );
     }
 
     // 2. Process plain text emails (if enabled in settings)
-    if ($this->obfuscate_plain) {
+    if ($this->obfuscate_plain && strpos($html, '@') !== false) {
       $html = preg_replace_callback(
         '/(<a\b[^>]*>.*?<\/a>|<span\b[^>]*class=["\'][^"\']*cryptomail-plain-email[^"\']*["\'][^>]*>.*?<\/span>|<script\b[^>]*>.*?<\/script>|<style\b[^>]*>.*?<\/style>|<textarea\b[^>]*>.*?<\/textarea>|<[^>]+>)|(\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b)/is',
         [$this, 'replace_plain_email'],
@@ -132,24 +135,23 @@ class Plugin
   }
 
   /**
-   * Validates the email, guards against re-masking an already-masked string, and builds the masked placeholder text (with optional hint suffix).
+   * Validates the email, guards against re-masking an already-masked string, and builds the masked placeholder text.
    *
-   * @return array{prefix:string,domain:string,base_masked:string,full_masked_text:string}|null
+   * @return array{base_masked:string,full_masked_text:string}|null
    */
   private function prepare_mask(string $email): ?array
   {
-    if (strpos($email, '@') === false) return null;
+    $at = strpos($email, '@');
+    if ($at === false) return null;
 
-    $at     = strpos($email, '@');
     $prefix = substr($email, 0, $at);
     $domain = substr($email, $at + 1);
 
     $char = substr($this->mask_char, 0, 1) ?: '*';
 
     // Prevent infinite loops/duplications if the email is already masked
-    if (preg_match('/^' . preg_quote($char, '/') . '+$/', $prefix)) return null;
+    if (strspn($prefix, $char) === strlen($prefix)) return null;
 
-    // Signal that we found a valid email and need to load the frontend scripts
     $this->has_processed_links = true;
 
     $length = $this->mask_length === 0 ? strlen($prefix) : $this->mask_length;
@@ -206,10 +208,7 @@ class Plugin
       $attrs = $this->merge_attribute($attrs, 'data-cryptomail-masked', esc_attr($full_masked_text));
     }
 
-    // HTML rebuilding relies on esc_attr to avoid XSS without destroying Theme Builder's custom attributes
-    $anchor = '<a' . $attrs . ' href="#" data-cryptomail-payload="' . esc_attr($encoded) . '">' . $masked_inner . '</a>';
-
-    return $anchor;
+    return '<a' . $attrs . ' href="#" data-cryptomail-payload="' . esc_attr($encoded) . '">' . $masked_inner . '</a>';
   }
 
   private function replace_plain_email(array $m): string
@@ -224,13 +223,14 @@ class Plugin
     $full_masked_text = $mask['full_masked_text'];
     $encoded = $this->encode($email);
 
-    $attrs = 'class="cryptomail-text-link cryptomail-plain-email" ';
-    $attrs .= 'data-cryptomail-payload="' . esc_attr($encoded) . '" ';
-    $attrs .= 'data-cryptomail-masked="' . esc_attr($full_masked_text) . '" ';
-
-    $span = '<span ' . $attrs . '>' . esc_html($full_masked_text) . '</span>';
-
-    return $span;
+    // Use an accessible anchor link instead of a span to support keyboard navigation (Tab/Enter)
+    return sprintf(
+      '<a href="#" class="cryptomail-text-link cryptomail-plain-email" rel="nofollow noindex" data-cryptomail-payload="%s" data-cryptomail-masked="%s" aria-label="%s">%s</a>',
+      esc_attr($encoded),
+      esc_attr($full_masked_text),
+      esc_attr__('Protected email address', 'crypto-mailto-defender'),
+      esc_html($full_masked_text)
+    );
   }
 
   private function merge_attribute(string $attrs, string $name, string $extra): string
@@ -249,10 +249,8 @@ class Plugin
 
   private function encode(string $string): string
   {
-    $raw_key = base64_decode($this->secret);
-    $iv_len  = openssl_cipher_iv_length('aes-256-cbc');
-    $iv      = random_bytes($iv_len);
-    $ciphertext = openssl_encrypt($string, 'aes-256-cbc', $raw_key, OPENSSL_RAW_DATA, $iv);
+    $iv = random_bytes(16);
+    $ciphertext = openssl_encrypt($string, 'aes-256-cbc', $this->raw_key, OPENSSL_RAW_DATA, $iv);
     return base64_encode($iv . $ciphertext);
   }
 
@@ -276,10 +274,10 @@ class Plugin
 
     $inject = "\n<!-- Crypto Mailto Defender Assets -->\n";
     // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedStylesheet
-    $inject .= "<link rel='stylesheet' id='cryptomail-frontend-css' href='" . esc_url($css_url . '?ver=1.0.1') . "' media='all' />\n";
+    $inject .= "<link rel='stylesheet' id='cryptomail-frontend-css' href='" . esc_url($css_url . '?ver=' . self::VERSION) . "' media='all' />\n";
     $inject .= "<script id='cryptomail-frontend-js-extra'>\nvar cryptomailConfig = " . $config . ";\n</script>\n";
     // phpcs:ignore WordPress.WP.EnqueuedResources.NonEnqueuedScript
-    $inject .= "<script src='" . esc_url($js_url . '?ver=1.0.1') . "' id='cryptomail-frontend-js'></script>\n";
+    $inject .= "<script src='" . esc_url($js_url . '?ver=' . self::VERSION) . "' id='cryptomail-frontend-js'></script>\n";
 
     if (stripos($html, '</body>') !== false) {
       return str_ireplace('</body>', $inject . '</body>', $html);
@@ -288,14 +286,29 @@ class Plugin
     return $html . $inject;
   }
 
-  /** AJAX endpoint for secure decryption with Rate Limiting */
+  /** AJAX endpoint for secure decryption with Rate Limiting & Anti-Bot checks */
   public function ajax_reveal_email(): void
   {
-    // Verify nonce for security
-    check_ajax_referer('cryptomail_reveal_nonce', 'nonce');
+    // 1. Verify Origin / XHR headers (or fallback to standard WordPress nonce)
+    $sec_fetch_site = isset($_SERVER['HTTP_SEC_FETCH_SITE']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_SEC_FETCH_SITE'])) : '';
+    if ($sec_fetch_site !== '' && !in_array($sec_fetch_site, ['same-origin', 'same-site', 'none'], true)) {
+      wp_send_json_error(['message' => esc_html__('Unauthorized request origin.', 'crypto-mailto-defender')]);
+    }
 
-    // Basic Rate Limiting: Max 30 requests per minute per IP to prevent AJAX flooding
-    $ip = isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : 'unknown';
+    // 2. Block User-Agent for known scrapers, crawlers, and headless bots
+    $ua = isset($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])) : '';
+    if ($ua === '' || preg_match('/bot|crawl|spider|curl|wget|python|scrapy|headless/i', $ua)) {
+      wp_send_json_error(['message' => esc_html__('Automated access denied.', 'crypto-mailto-defender')]);
+    }
+
+    // 3. Retrieve real client IP supporting Cloudflare proxy headers with strict sanitization
+    $ip = 'unknown';
+    if (isset($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+      $ip = sanitize_text_field(wp_unslash($_SERVER['HTTP_CF_CONNECTING_IP']));
+    } elseif (isset($_SERVER['REMOTE_ADDR'])) {
+      $ip = sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR']));
+    }
+
     $transient_key = 'cryptomail_rate_' . md5($ip);
     $attempts = (int) get_transient($transient_key);
 
@@ -304,31 +317,67 @@ class Plugin
     }
     set_transient($transient_key, $attempts + 1, MINUTE_IN_SECONDS);
 
-    // Payload validation
+    // 4. Payload & Human Proof / Nonce verification
+    // phpcs:ignore WordPress.Security.NonceVerification.Missing
     $payload = isset($_POST['payload']) ? sanitize_text_field(wp_unslash($_POST['payload'])) : '';
+    // phpcs:ignore WordPress.Security.NonceVerification.Missing
+    $proof   = isset($_POST['proof']) ? sanitize_text_field(wp_unslash($_POST['proof'])) : '';
+    // phpcs:ignore WordPress.Security.NonceVerification.Missing
+    $nonce   = isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '';
+
     if (empty($payload)) {
       wp_send_json_error(['message' => esc_html__('No payload provided.', 'crypto-mailto-defender')]);
     }
 
-    $data = base64_decode($payload);
-    $iv_len = openssl_cipher_iv_length('aes-256-cbc');
+    // Accept the request if the hardware human proof is valid OR if the WP nonce is valid (when not in Strict Mode)
+    $proof_valid = $this->verify_human_proof($payload, $proof);
+    $nonce_valid = !empty($nonce) && wp_verify_nonce($nonce, 'cryptomail_reveal_nonce');
 
-    if (strlen($data) <= $iv_len) {
+    if ($this->strict_protection) {
+      if (!$proof_valid && !$nonce_valid) {
+        wp_send_json_error(['message' => esc_html__('Bot protection triggered.', 'crypto-mailto-defender')]);
+      }
+    }
+
+    $data = base64_decode($payload, true);
+    if ($data === false || strlen($data) <= 16) {
       wp_send_json_error(['message' => esc_html__('Invalid payload format.', 'crypto-mailto-defender')]);
     }
 
-    $iv = substr($data, 0, $iv_len);
-    $ciphertext = substr($data, $iv_len);
-    $raw_key = base64_decode($this->secret);
+    $iv = substr($data, 0, 16);
+    $ciphertext = substr($data, 16);
 
     // AES decryption
-    $decrypted = openssl_decrypt($ciphertext, 'aes-256-cbc', $raw_key, OPENSSL_RAW_DATA, $iv);
+    $decrypted = openssl_decrypt($ciphertext, 'aes-256-cbc', $this->raw_key, OPENSSL_RAW_DATA, $iv);
 
     if ($decrypted !== false) {
       wp_send_json_success(['email' => $decrypted]);
     } else {
       wp_send_json_error(['message' => esc_html__('Decryption failed. Integrity check error.', 'crypto-mailto-defender')]);
     }
+  }
+
+  private function verify_human_proof(string $payload, string $proof): bool
+  {
+    if ($proof === '') return false;
+
+    $decoded = base64_decode($proof, true);
+    if ($decoded === false) return false;
+
+    $parts = explode('|', $decoded);
+    if (count($parts) !== 3) return false;
+
+    [$ts, $hold_ms, $sig] = $parts;
+    if (!ctype_digit($ts) || !ctype_digit($hold_ms)) return false;
+
+    // On mobile/touchpad a human tap lasts at least 1ms; synthetic JS clicks take 0ms
+    if ((int) $hold_ms < 1 || (int) $hold_ms > 30000) return false;
+
+    $expected = substr($payload, 0, 16) . ':' . $ts . ':' . $hold_ms;
+    // sprintf('%u') forces an unsigned 32-bit integer matching JavaScript's (>>> 0)
+    $expected_sig = sprintf('%u', crc32($expected));
+
+    return hash_equals($expected_sig, $sig);
   }
 
   // =========================================================================
@@ -389,7 +438,7 @@ class Plugin
       'cryptomail_strict_protection',
       1,
       __('Hardware Interaction Required', 'crypto-mailto-defender'),
-      __('When enabled, decryption triggers ONLY upon a physical user interaction (isTrusted event). This heavily blocks automated JS click bots like Puppeteer or Selenium. Disabling this allows any script to trigger decryption (useful for compatibility with certain page builders), but significantly reduces spam protection.', 'crypto-mailto-defender')
+      __('When enabled, decryption triggers ONLY upon a verified physical interaction (measuring press duration and blocking automated browser drivers). This prevents headless bots like Puppeteer or Selenium from scraping addresses.', 'crypto-mailto-defender')
     );
   }
 
@@ -457,7 +506,7 @@ class Plugin
             <p><?php esc_html_e('Manage and configure the AES-256 encrypted email protection for your users.', 'crypto-mailto-defender'); ?></p>
           </div>
         </div>
-        <div class="cryptomail-version-badge">v1.0.0</div>
+        <div class="cryptomail-version-badge">v<?php echo esc_html(self::VERSION); ?></div>
       </div>
 
       <div class="cryptomail-grid-layout">
@@ -502,7 +551,6 @@ class Plugin
     if (get_option('cryptomail_activation_redirect', false)) {
       delete_option('cryptomail_activation_redirect');
 
-      // Do not redirect if the user is activating multiple plugins at once
       // phpcs:ignore WordPress.Security.NonceVerification.Recommended
       if (!isset($_GET['activate-multi'])) {
         wp_safe_redirect(admin_url('options-general.php?page=crypto-mailto-defender'));
@@ -518,8 +566,26 @@ class Plugin
     array_unshift($links, $settings_link);
     return $links;
   }
+
+  /** Clean up all plugin options upon uninstallation. */
+  public static function uninstall(): void
+  {
+    $options = [
+      'cryptomail_aes_secret',
+      'cryptomail_mask_character',
+      'cryptomail_mask_length',
+      'cryptomail_hint_text',
+      'cryptomail_strict_protection',
+      'cryptomail_obfuscate_plain',
+      'cryptomail_activation_redirect',
+    ];
+    foreach ($options as $opt) {
+      delete_option($opt);
+    }
+  }
 }
 
 register_activation_hook(__FILE__, ['MarcoPetrucci\CryptoMailto\Plugin', 'activate']);
+register_uninstall_hook(__FILE__, ['MarcoPetrucci\CryptoMailto\Plugin', 'uninstall']);
 
 new Plugin();
