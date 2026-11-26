@@ -4,7 +4,7 @@
   --cryptomail-primary-light: rgba(99, 102, 241, 0.1);
   --cryptomail-bg: #f3f4f6;
   --cryptomail-text-main: #111827;
-  --cryptomail-text-sub: #6b7280;
+  --cryptomail-text-sub: #4b5563;
   --cryptomail-border: #e5e7eb;
   --cryptomail-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
 }
@@ -84,16 +84,13 @@
   color: white;
 }
 
-/* Title overriding WP default H2 styling */
-.cryptomail-brand h2.cryptomail-title {
+.cryptomail-brand p.cryptomail-title {
   font-size: 28px;
   font-weight: 800;
-  color: #111827;
+  color: var(--cryptomail-text-main);
   margin: 0 0 4px 0;
   letter-spacing: -0.02em;
   line-height: 1;
-  border: none;
-  padding: 0;
 }
 
 .cryptomail-brand p {
@@ -125,14 +122,13 @@
 .cryptomail-main-col {
   display: flex;
   flex-direction: column;
-  padding-bottom: 120px;
-  /* room for the floating save bar */
+  padding-bottom: 48px;
 }
 
 .cryptomail-main-col>form {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
 }
 
 /* Section cards */
@@ -142,13 +138,12 @@
   border-radius: 14px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .cryptomail-card:hover {
   border-color: #cbd5e1;
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
 }
 
 .cryptomail-card-header {
@@ -205,7 +200,7 @@
   display: block;
   margin-bottom: 8px;
   font-size: 15px;
-  color: #111827;
+  color: var(--cryptomail-text-main);
 }
 
 .cryptomail-field .description {
@@ -225,19 +220,261 @@
   border-radius: 10px;
   padding: 12px 16px;
   font-size: 14px;
-  color: #111827;
-  transition: all 0.2s;
+  color: var(--cryptomail-text-main);
+  transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
   font-family: inherit;
   font-weight: 500;
   height: auto;
   line-height: normal;
 }
 
-.cryptomail-dashboard-wrap input:focus {
+.cryptomail-dashboard-wrap input:focus,
+.cryptomail-tag-box:focus-within {
   background: #fff;
   border-color: var(--cryptomail-accent);
   box-shadow: 0 0 0 4px var(--cryptomail-primary-light);
-  outline: none;
+  outline: 2px solid transparent;
+}
+
+/* Target Emails / Domains Chip Widget */
+.cryptomail-field-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.cryptomail-field-head .cryptomail-field-label {
+  margin-bottom: 0;
+}
+
+.cryptomail-mode-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.cryptomail-mode-badge.is-all {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.cryptomail-mode-badge.is-targeted {
+  background: #eef2ff;
+  color: #4338ca;
+  border: 1px solid #c7d2fe;
+}
+
+.cryptomail-mode-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.cryptomail-tag-box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 7px 8px 7px 12px;
+  background: #f9fafb;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  cursor: text;
+  transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.cryptomail-tag-box.has-error {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.12);
+}
+
+.cryptomail-tag-entry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+.cryptomail-dashboard-wrap .cryptomail-tag-input[type=text] {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 6px 4px;
+  box-shadow: none;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.cryptomail-dashboard-wrap .cryptomail-tag-input[type=text]:focus {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.cryptomail-tag-add {
+  flex-shrink: 0;
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px solid #c7d2fe;
+  background: #eef2ff;
+  color: #4338ca;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.cryptomail-tag-add:hover {
+  background: var(--cryptomail-accent);
+  border-color: var(--cryptomail-accent);
+  color: #fff;
+}
+
+.cryptomail-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px 4px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  max-width: 100%;
+}
+
+.cryptomail-chip.is-email {
+  background: #eef2ff;
+  color: #3730a3;
+  border: 1px solid #c7d2fe;
+}
+
+.cryptomail-chip.is-domain {
+  background: #faf5ff;
+  color: #6b21a8;
+  border: 1px solid #e9d5ff;
+}
+
+.cryptomail-chip-kind {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(168, 85, 247, 0.16);
+  color: #7e22ce;
+}
+
+.cryptomail-chip-text {
+  word-break: break-all;
+}
+
+.cryptomail-chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: currentColor;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.65;
+  transition: background-color 0.15s, opacity 0.15s;
+}
+
+.cryptomail-chip-remove:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.cryptomail-chip.is-pulse {
+  animation: cryptomail-pulse 0.35s ease;
+}
+
+@keyframes cryptomail-pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+.cryptomail-inline-error {
+  margin: 6px 0 0 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #dc2626;
+}
+
+.cryptomail-target-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.cryptomail-target-examples {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  font-size: 12.5px;
+  color: var(--cryptomail-text-sub);
+}
+
+.cryptomail-target-examples code {
+  background: #f3f4f6;
+  color: #374151;
+  padding: 2px 6px;
+  border-radius: 5px;
+  font-size: 12px;
+}
+
+.cryptomail-quick-add {
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px dashed #c084fc;
+  background: #faf5ff;
+  color: #7e22ce;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.cryptomail-quick-add:hover {
+  background: #9333ea;
+  border-color: #9333ea;
+  color: #fff;
 }
 
 .cryptomail-dashboard-wrap input[type=number].cryptomail-input-small,
@@ -246,9 +483,9 @@
 }
 
 .cryptomail-masking-fields {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
 }
 
 .cryptomail-masking-fields .cryptomail-input-small {
@@ -258,24 +495,43 @@
 /* Custom Toggle Switch */
 .cryptomail-switch-row {
   display: flex;
-  align-items: center;
-  gap: 16px;
-  border-radius: 12px;
-  margin-bottom: 10px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.cryptomail-switch-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.cryptomail-switch-text strong {
+  font-size: 15px;
+  color: var(--cryptomail-text-main);
+  display: block;
+}
+
+.cryptomail-switch-text .description {
+  margin-top: 6px;
 }
 
 .cryptomail-switch {
   position: relative;
-  width: 54px;
-  height: 30px;
+  width: 50px;
+  height: 28px;
   flex-shrink: 0;
-  margin: 0;
+  margin: 2px 0 0 0;
 }
 
 .cryptomail-switch input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
   opacity: 0;
-  width: 0;
-  height: 0;
+  cursor: pointer;
+  z-index: 1;
 }
 
 .cryptomail-slider {
@@ -283,155 +539,241 @@
   cursor: pointer;
   inset: 0;
   background-color: #cbd5e1;
-  transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: .25s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 99px;
 }
 
 .cryptomail-slider:before {
   position: absolute;
   content: "";
-  height: 24px;
-  width: 24px;
+  height: 22px;
+  width: 22px;
   left: 3px;
   bottom: 3px;
   background-color: white;
-  transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: .25s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 50%;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .cryptomail-switch input:checked+.cryptomail-slider {
-  background: linear-gradient(135deg, var(--cryptomail-accent), var(--cryptomail-accent-2));
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
 }
 
 .cryptomail-switch input:checked+.cryptomail-slider:before {
-  transform: translateX(24px);
+  transform: translateX(22px);
 }
 
-.cryptomail-switch-text strong {
-  font-size: 15px;
-  color: #111827;
-  display: block;
-}
-
-/* Floating Save Bar (Glassmorphism) */
-.cryptomail-floating-bar {
+/* Auto-save Toast */
+.cryptomail-toast {
   position: fixed;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  padding: 16px 24px;
-  border-radius: 20px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.05);
-  z-index: 999;
-  display: flex;
-  align-items: center;
-  animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-  width: 90%;
-  max-width: 700px;
-  justify-content: space-between;
-}
-
-@keyframes slideUp {
-  from {
-    transform: translate(-50%, 150%);
-    opacity: 0;
-  }
-
-  to {
-    transform: translate(-50%, 0);
-    opacity: 1;
-  }
-}
-
-.cryptomail-bar-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.cryptomail-bar-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.cryptomail-bar-text strong {
-  font-size: 15px;
-  color: #111827;
-  line-height: 1.2;
-}
-
-.cryptomail-bar-text span {
-  font-size: 13px;
-  color: #6b7280;
-  font-weight: 500;
-}
-
-/* Gradient Primary Button */
-.cryptomail-btn-primary {
-  background: linear-gradient(135deg, var(--cryptomail-accent) 0%, var(--cryptomail-accent-2) 100%) !important;
-  color: white !important;
-  border: none !important;
-  padding: 12px 28px !important;
-  border-radius: 12px !important;
-  font-weight: 700 !important;
-  font-size: 15px !important;
+  right: 24px;
+  bottom: 24px;
+  z-index: 9999;
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: #111827;
+  color: #fff;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.2;
+  box-shadow: 0 12px 30px rgba(17, 24, 39, 0.22);
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+}
+
+.cryptomail-toast[hidden] {
+  display: none;
+}
+
+.cryptomail-toast.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.cryptomail-toast.is-saved {
+  background: #065f46;
+}
+
+.cryptomail-toast.is-error {
+  background: #991b1b;
+}
+
+.cryptomail-toast-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.cryptomail-toast-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: cryptomail-toast-spin 0.65s linear infinite;
+}
+
+@keyframes cryptomail-toast-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.cryptomail-toast-retry {
+  margin-left: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  line-height: 1 !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-.cryptomail-btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(168, 85, 247, 0.4);
-  filter: brightness(1.05);
+.cryptomail-toast-retry:hover {
+  background: rgba(255, 255, 255, 0.25);
 }
 
-@media(max-width: 640px) {
-  .cryptomail-floating-bar {
-    bottom: 15px;
-    flex-direction: column;
-    gap: 16px;
-    padding: 20px;
-    border-radius: 16px;
-  }
+/* Noscript fallback button */
+.cryptomail-noscript-save {
+  margin-top: 8px;
+}
 
-  .cryptomail-bar-content {
-    flex-direction: column;
-    gap: 16px;
-    text-align: center;
-  }
-
-  .cryptomail-btn-primary {
-    width: 100%;
-    justify-content: center;
-  }
+.cryptomail-btn-primary {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
 }
 
 @media (max-width: 768px) {
   .cryptomail-dashboard-wrap {
-    overflow-x: hidden;
+    margin: 16px 0;
+  }
+
+  .cryptomail-header {
+    margin-bottom: 24px;
   }
 
   .cryptomail-card-header {
-    padding: 18px 20px 14px 44px;
+    padding: 16px 18px 14px 40px;
   }
 
   .cryptomail-card-header::before {
-    left: 20px;
-    top: 25px;
+    left: 18px;
+    top: 23px;
   }
 
   .cryptomail-card-body {
-    padding: 4px 20px;
+    padding: 4px 18px;
+  }
+}
+
+@media (max-width: 640px) {
+  .cryptomail-header {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .cryptomail-brand {
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .cryptomail-logo-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+
+  .cryptomail-brand p.cryptomail-title {
+    font-size: 20px;
+    line-height: 1.15;
+  }
+
+  .cryptomail-brand p {
+    font-size: 13px;
+  }
+
+  .cryptomail-version-badge {
+    flex-shrink: 0;
+    padding: 4px 10px;
+    font-size: 11px;
+  }
+
+  .cryptomail-field {
+    padding: 16px 0;
+  }
+
+  .cryptomail-switch-row {
+    gap: 14px;
+  }
+
+  .cryptomail-tag-entry {
+    flex-basis: 100%;
+  }
+
+  .cryptomail-chip-remove {
+    width: 24px;
+    height: 24px;
+  }
+
+  .cryptomail-masking-fields {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .cryptomail-toast {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    justify-content: center;
+  }
+}
+
+.cryptomail-switch-text label {
+  cursor: pointer;
+}
+
+.cryptomail-switch input:focus-visible+.cryptomail-slider {
+  box-shadow: 0 0 0 4px var(--cryptomail-primary-light), 0 0 0 2px var(--cryptomail-accent);
+}
+
+.cryptomail-tag-add:focus-visible,
+.cryptomail-chip-remove:focus-visible,
+.cryptomail-quick-add:focus-visible,
+.cryptomail-btn-primary:focus-visible,
+.cryptomail-toast-retry:focus-visible {
+  outline: 2px solid var(--cryptomail-accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .cryptomail-dashboard-wrap *,
+  .cryptomail-dashboard-wrap *::before,
+  .cryptomail-dashboard-wrap *::after {
+    animation: none !important;
+    transition: none !important;
   }
 }

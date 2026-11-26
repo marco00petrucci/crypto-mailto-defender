@@ -2,6 +2,18 @@
   cursor: pointer;
 }
 
+.cryptomail-masked-email,
+.cryptomail-mask {
+  float: none !important;
+  clear: none !important;
+  display: inline !important;
+  position: static !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: auto !important;
+  height: auto !important;
+}
+
 .cryptomail-loading {
   cursor: progress !important;
   pointer-events: none;
@@ -10,9 +22,9 @@
 
 .cryptomail-loading .cryptomail-mask {
   position: relative !important;
-  display: inline-block;
-  width: 0.9em;
-  height: 0.9em;
+  display: inline-block !important;
+  width: 0.9em !important;
+  height: 0.9em !important;
   overflow: hidden;
   text-indent: -9999px;
   vertical-align: -0.12em;
@@ -46,5 +58,25 @@
 @keyframes cryptomail-spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+.cryptomail-sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cryptomail-loading .cryptomail-mask::after,
+  .cryptomail-loading:not(.cryptomail-text-link)::after {
+    animation-duration: 1.8s;
   }
 }
