@@ -3,12 +3,11 @@
 /**
  * Plugin Name: Crypto Mailto Defender
  * Description: Enterprise spam protection. Encrypts mailto: links server-side with AES-256 and securely decrypts them via AJAX upon human interaction.
- * Version: 1.3.0
+ * Version: 1.3.1
  * Author: Marco Petrucci
  * Author URI: https://linktr.ee/marco00petrucci
  * Text Domain: crypto-mailto-defender
  * Requires at least: 6.3
- * Tested up to: 7.1
  * Requires PHP: 7.4
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -22,7 +21,7 @@ if (!defined('ABSPATH')) {
 
 class Plugin
 {
-  private const VERSION = '1.3.0';
+  private const VERSION = '1.3.1';
   private const CIPHER_AAD = 'cryptomail_v1';
 
   private const SETTINGS_SLUG = 'crypto-mailto-defender';
@@ -88,8 +87,7 @@ class Plugin
       return '';
     }
     // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-    $val = wp_unslash($_REQUEST[$key]);
-    return $as_key ? sanitize_key($val) : sanitize_text_field($val);
+    return $as_key ? sanitize_key(wp_unslash($_REQUEST[$key])) : sanitize_text_field(wp_unslash($_REQUEST[$key]));
   }
 
   private function settings_url(): string
@@ -412,13 +410,14 @@ class Plugin
       $action       = $this->request_var('action', true);
 
       // Forminator sends preview_data as "[]", "{}", or "false" on normal frontend AJAX loads
-      $preview_data_raw = isset($_REQUEST['preview_data']) ? wp_unslash($_REQUEST['preview_data']) : null;
       $has_preview_data = false;
-      if (is_array($preview_data_raw)) {
-        $has_preview_data = !empty($preview_data_raw);
-      } elseif (is_string($preview_data_raw)) {
-        $trimmed          = strtolower(trim($preview_data_raw));
-        $has_preview_data = $trimmed !== '' && !in_array($trimmed, ['false', '0', '[]', '{}', 'null'], true);
+      if (isset($_REQUEST['preview_data'])) {
+        if (is_array($_REQUEST['preview_data'])) {
+          $has_preview_data = !empty($_REQUEST['preview_data']);
+        } elseif (is_string($_REQUEST['preview_data'])) {
+          $trimmed          = strtolower(sanitize_text_field(wp_unslash($_REQUEST['preview_data'])));
+          $has_preview_data = $trimmed !== '' && !in_array($trimmed, ['false', '0', '[]', '{}', 'null'], true);
+        }
       }
 
       $is_preview = (function_exists('is_preview') && is_preview())
@@ -445,12 +444,12 @@ class Plugin
       if (!$skip) {
         $query_keys = array_map('sanitize_key', wp_unslash(array_keys($_REQUEST)));
         $sec_dest   = sanitize_key($this->server_var('HTTP_SEC_FETCH_DEST'));
-        $extra      = isset($_REQUEST['extra']) && is_array($_REQUEST['extra']) ? $_REQUEST['extra'] : [];
+        $has_extra  = isset($_REQUEST['extra']) && is_array($_REQUEST['extra']);
         $referers   = array_filter([
           'http'       => $this->server_var('HTTP_REFERER'),
           'wp'         => $this->request_var('_wp_http_referer'),
-          'extra_wp'   => isset($extra['_wp_http_referer']) && is_string($extra['_wp_http_referer']) ? sanitize_text_field(wp_unslash($extra['_wp_http_referer'])) : '',
-          'extra_url'  => isset($extra['referer_url']) && is_string($extra['referer_url']) ? sanitize_text_field(wp_unslash($extra['referer_url'])) : '',
+          'extra_wp'   => $has_extra && isset($_REQUEST['extra']['_wp_http_referer']) && is_string($_REQUEST['extra']['_wp_http_referer']) ? sanitize_text_field(wp_unslash($_REQUEST['extra']['_wp_http_referer'])) : '',
+          'extra_url'  => $has_extra && isset($_REQUEST['extra']['referer_url']) && is_string($_REQUEST['extra']['referer_url']) ? sanitize_text_field(wp_unslash($_REQUEST['extra']['referer_url'])) : '',
           'direct_url' => $this->request_var('referer_url'),
         ]);
 

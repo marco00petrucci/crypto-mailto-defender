@@ -4,7 +4,7 @@ Donate link: https://www.paypal.me/marco00petrucci
 Tags: email, mailto, spam, antispam, email-protection
 Requires at least: 6.3
 Tested up to: 7.1
-Stable tag: 1.3.0
+Stable tag: 1.3.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -84,6 +84,9 @@ Protection is automatically skipped in the block editor, Customizer, and editing
 
 == Changelog ==
 
+= 1.3.1 =
+* **Fix:** Resolved WordPress Plugin Check warnings and removed the duplicate `Tested up to` header from the main plugin file.
+
 = 1.3.0 =
 * **Feature:** Added **Targeted Protection** with an interactive chip UI to protect specific emails or wildcard domains, bypassing full-site regex scanning when configured.
 * **Security:** Bound AES-256-GCM AAD to `home` URL; unified anti-replay (300s TTL) and rate limiting into a 500-entry bucket with 3x failed-attempt penalty; validated parameters before touching rate-limit storage; added `Content-Type`, `Accept-Language`, and `Sec-CH-UA` checks; made secret-key init race-safe via `add_option()`.
@@ -111,5 +114,5 @@ Protection is automatically skipped in the block editor, Customizer, and editing
 
 == Upgrade Notice ==
 
-= 1.3.0 =
+= 1.3.1 =
 Added Targeted Protection for specific emails/domains, major accessibility upgrades, and hardened AES-256-GCM AAD binding. Purge your page cache after updating from 1.2.0 so existing cached pages decrypt properly.
